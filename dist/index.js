@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
 const ws_1 = __importDefault(require("ws"));
+const socket_io_1 = __importDefault(require("socket.io"));
 const app = (0, express_1.default)();
 app.set("view engine", "pug");
 app.set("views", __dirname + "/views");
@@ -16,25 +17,12 @@ const server = http_1.default.createServer(app);
 class WebSocketObj extends ws_1.default {
 }
 const sockets = [];
-const wss = new ws_1.default.Server({ server });
-wss.on("connection", (socket) => {
-    sockets.push(socket);
-    socket["nickname"] = "Anon";
-    console.log("connected to browser.");
-    socket.on("close", () => console.log("disconnected from browser"));
-    socket.on("message", (msg) => {
-        const message = JSON.parse(msg.toString("utf8"));
-        switch (message.type) {
-            case "new_message":
-                sockets.forEach((eachSocket) => eachSocket.send(`${socket.nickname}: ${message.payload}`));
-                break;
-            case "nickname":
-                socket["nickname"] = message.payload;
-                break;
-        }
-    });
+const wsServer = new socket_io_1.default.Server(server);
+wsServer.on("connection", (socket) => {
+    console.log(socket);
 });
 server.listen(3000, () => {
     console.log("http://localhost:3000");
+    console.log("http://localhost:3000/socket.io/socket.io.js");
 });
 //# sourceMappingURL=index.js.map

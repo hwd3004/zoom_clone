@@ -1,6 +1,7 @@
 import express from "express";
 import http from "http";
 import WebSocket from "ws";
+import SocketIO from "socket.io";
 
 const app = express();
 
@@ -26,46 +27,53 @@ class WebSocketObj extends WebSocket {
 // 페이크 데이터베이스
 const sockets: WebSocketObj[] = [];
 
-const wss = new WebSocket.Server({ server });
+// const wss = new WebSocket.Server({ server });
+const wsServer = new SocketIO.Server(server);
 
-wss.on("connection", (socket: WebSocketObj) => {
-  sockets.push(socket); // 여러 브라우저(사용자)를 연결시키기 위해 추가
+// wss.on("connection", (socket: WebSocketObj) => {
+//   sockets.push(socket); // 여러 브라우저(사용자)를 연결시키기 위해 추가
 
-  socket["nickname"] = "Anon";
+//   socket["nickname"] = "Anon";
 
-  //   console.log(socket);
-  console.log("connected to browser.");
+//   //   console.log(socket);
+//   console.log("connected to browser.");
 
-  socket.on("close", () => console.log("disconnected from browser"));
+//   socket.on("close", () => console.log("disconnected from browser"));
 
-  //   socket.on("message", (message) => console.log(message.toString("utf8")));
-  //
-  //   socket.on("message", (message) => {
-  //     socket.send(message.toString("utf8"));
-  //   });
-  //
-  socket.on("message", (msg) => {
-    interface Message extends Object {
-      type: String;
-      payload: String;
-    }
+//   //   socket.on("message", (message) => console.log(message.toString("utf8")));
+//   //
+//   //   socket.on("message", (message) => {
+//   //     socket.send(message.toString("utf8"));
+//   //   });
+//   //
+//   socket.on("message", (msg) => {
+//     interface Message extends Object {
+//       type: String;
+//       payload: String;
+//     }
 
-    const message: Message = JSON.parse(msg.toString("utf8"));
+//     const message: Message = JSON.parse(msg.toString("utf8"));
 
-    switch (message.type) {
-      case "new_message":
-        sockets.forEach((eachSocket) => eachSocket.send(`${socket.nickname}: ${message.payload}`));
-        break;
-      case "nickname":
-        // socket의 타입은 object
-        socket["nickname"] = message.payload;
-        break;
-    }
-  });
+//     switch (message.type) {
+//       case "new_message":
+//         sockets.forEach((eachSocket) => eachSocket.send(`${socket.nickname}: ${message.payload}`));
+//         break;
+//       case "nickname":
+//         // socket의 타입은 object
+//         socket["nickname"] = message.payload;
+//         break;
+//     }
+//   });
 
-  //   socket.send("hello");
+//   //   socket.send("hello");
+// });
+
+wsServer.on("connection", (socket) => {
+  console.log(socket);
+  
 });
 
 server.listen(3000, () => {
   console.log("http://localhost:3000");
+  console.log("http://localhost:3000/socket.io/socket.io.js");
 });
